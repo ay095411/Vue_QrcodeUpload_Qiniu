@@ -59,17 +59,22 @@
 
 
 #  #server的目录结构
-
-    lytton@lytton-ubuntu:~/桌面/demo/qiniuupload/src/server$ tree -L 1
     .
     ├── app.js
     ├── config.js
     ├── node_modules
     └── package.json
-    
-    然后控制台 nodemon app.js，当然如果没装nodemon的话，就 node app.js 一样的
-    打开浏览器 localhost:3000
-    
+    ├── App.vue
+    ├── client
+    │   └── upload.vue
+    ├── main.js
+    ├── router
+    │   └── index.js
+    └── server
+    ├── app.js
+    ├── config.js
+    ├── node_modules
+    └── package.json
     
     写前端代码
     首先在根目录安装element-ui axios
@@ -92,18 +97,6 @@
     }
       ]
     })
-    
-    ├── App.vue
-    ├── client
-    │   └── upload.vue
-    ├── main.js
-    ├── router
-    │   └── index.js
-    └── server
-    ├── app.js
-    ├── config.js
-    ├── node_modules
-    └── package.json
     
     
 #  #打开config文件夹下的index.js 添加跨域代理访问
