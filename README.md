@@ -4,14 +4,14 @@
 
 > 模拟前后端分离，后端向前端发送七牛云的上传凭证token，前端获得凭证后将图片上传到七牛云，并获得返回的图片url地址
 
-#要用到的： 
+#  #要用到的： 
       1、 空间名称bucket
       2、 SK 和 AK ,在控制面板的密匙管理
       3、 储存空间的外链域名，在储存空间可以找到
       
       
       
-#创建后端程序app.js
+#  #创建后端程序app.js
 
     // 引入包
     const express = require('express')
@@ -34,7 +34,7 @@
 
 
 
-#创建config.js以用来生成上传凭证
+#  #创建config.js以用来生成上传凭证
 
     这里就需要用到上面的bucket ,AK,SK
     /*
@@ -58,7 +58,7 @@
     }
 
 
-#server的目录结构
+#  #server的目录结构
 
     lytton@lytton-ubuntu:~/桌面/demo/qiniuupload/src/server$ tree -L 1
     .
@@ -106,7 +106,7 @@
     └── package.json
     
     
-#打开config文件夹下的index.js 添加跨域代理访问
+#  #打开config文件夹下的index.js 添加跨域代理访问
 
     module.exports = {
       dev: {
@@ -126,105 +126,105 @@
     
     
     
-#写upload.vue 代码比较简单，从element-ui官网拷贝过来就可以用了
-    <TEMPLATE>
-      <!-- UPLOAD -->
-      <DIV CLASS="UPLOAD">
-    <EL-UPLOAD
-      CLASS="AVATAR-UPLOADER"
-      :ACTION= DOMAIN
-      :HTTP-REQUEST = UPQINIU
-      :SHOW-FILE-LIST="FALSE"
-      :BEFORE-UPLOAD="BEFOREUPLOAD">
-      <IMG V-IF="IMAGEURL" :SRC="IMAGEURL" CLASS="AVATAR">
-      <I V-ELSE CLASS="EL-ICON-PLUS AVATAR-UPLOADER-ICON"></I>
-    </EL-UPLOAD>
-      </DIV>
-    </TEMPLATE>
-    <SCRIPT>
-    EXPORT DEFAULT {
-      DATA () {
-    RETURN {
-      IMAGEURL: '',
-      TOKEN: {},
+#  #写upload.vue 代码比较简单，从element-ui官网拷贝过来就可以用了
+    <template>
+      <!-- upload -->
+      <div class="upload">
+    <el-upload
+      class="avatar-uploader"
+      :action= domain
+      :http-request = upqiniu
+      :show-file-list="false"
+      :before-upload="beforeupload">
+      <img v-if="imageurl" :src="imageurl" class="avatar">
+      <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+    </el-upload>
+      </div>
+    </template>
+    <script>
+    export default {
+      data () {
+    return {
+      imageurl: '',
+      token: {},
       // 七牛云的上传地址，根据自己所在地区选择，我这里是华南区
-      DOMAIN: 'HTTPS://UPLOAD-Z2.QINIUP.COM',
+      domain: 'https://upload-z2.qiniup.com',
       // 这是七牛云空间的外链默认域名
-      QINIUADDR: 'P3Z6Q1UW1.BKT.CLOUDDN.COM'
+      qiniuaddr: 'p3z6q1uw1.bkt.clouddn.com'
     }
       },
-      METHODS: {
+      methods: {
     // 上传文件到七牛云
-    UPQINIU (REQ) {
-      CONSOLE.LOG(REQ)
-      CONST CONFIG = {
-    HEADERS: {'CONTENT-TYPE': 'MULTIPART/FORM-DATA'}
+    upqiniu (req) {
+      console.log(req)
+      const config = {
+    headers: {'content-type': 'multipart/form-data'}
       }
-      LET FILETYPE = ''
-      IF (REQ.FILE.TYPE === 'IMAGE/PNG') {
-    FILETYPE = 'PNG'
-      } ELSE {
-    FILETYPE = 'JPG'
+      let filetype = ''
+      if (req.file.type === 'image/png') {
+    filetype = 'png'
+      } else {
+    filetype = 'jpg'
       }
       // 重命名要上传的文件
-      CONST KEYNAME = 'LYTTON' + NEW DATE() + MATH.FLOOR(MATH.RANDOM() * 100) + '.' + FILETYPE
-      // 从后端获取上传凭证TOKEN
-      THIS.AXIOS.GET('/UP/TOKEN').THEN(RES => {
-    CONSOLE.LOG(RES)
-    CONST FORMDATA = NEW FORMDATA()
-    FORMDATA.APPEND('FILE', REQ.FILE)
-    FORMDATA.APPEND('TOKEN', RES.DATA)
-    FORMDATA.APPEND('KEY', KEYNAME)
+      const keyname = 'lytton' + new date() + math.floor(math.random() * 100) + '.' + filetype
+      // 从后端获取上传凭证token
+      this.axios.get('/up/token').then(res => {
+    console.log(res)
+    const formdata = new formdata()
+    formdata.append('file', req.file)
+    formdata.append('token', res.data)
+    formdata.append('key', keyname)
     // 获取到凭证之后再将文件上传到七牛云空间
-    THIS.AXIOS.POST(THIS.DOMAIN, FORMDATA, CONFIG).THEN(RES => {
-      THIS.IMAGEURL = 'HTTP://' + THIS.QINIUADDR + '/' + RES.DATA.KEY
-      // CONSOLE.LOG(THIS.IMAGEURL)
+    this.axios.post(this.domain, formdata, config).then(res => {
+      this.imageurl = 'http://' + this.qiniuaddr + '/' + res.data.key
+      // console.log(this.imageurl)
     })
       })
     },
     // 验证文件合法性
-    BEFOREUPLOAD (FILE) {
-      CONST ISJPG = FILE.TYPE === 'IMAGE/JPEG' || FILE.TYPE === 'IMAGE/PNG'
-      CONST ISLT2M = FILE.SIZE / 1024 / 1024 < 2
-      IF (!ISJPG) {
-    THIS.$MESSAGE.ERROR('上传头像图片只能是 JPG 格式!')
+    beforeupload (file) {
+      const isjpg = file.type === 'image/jpeg' || file.type === 'image/png'
+      const islt2m = file.size / 1024 / 1024 < 2
+      if (!isjpg) {
+    this.$message.error('上传头像图片只能是 jpg 格式!')
       }
-      IF (!ISLT2M) {
-    THIS.$MESSAGE.ERROR('上传头像图片大小不能超过 2MB!')
+      if (!islt2m) {
+    this.$message.error('上传头像图片大小不能超过 2mb!')
       }
-      RETURN ISJPG && ISLT2M
+      return isjpg && islt2m
     }
       }
     }
-    </SCRIPT>
-    <STYLE SCOPED>
-    .UPLOAD {
-      WIDTH: 600PX;
-      MARGIN: 0 AUTO;
+    </script>
+    <style scoped>
+    .upload {
+      width: 600px;
+      margin: 0 auto;
     }
-    .AVATAR-UPLOADER .EL-UPLOAD {
-      BORDER: 5PX DASHED #CA1717 !IMPORTANT;
-      BORDER-RADIUS: 6PX;
-      CURSOR: POINTER;
-      POSITION: RELATIVE;
-      OVERFLOW: HIDDEN;
+    .avatar-uploader .el-upload {
+      border: 5px dashed #ca1717 !important;
+      border-radius: 6px;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
     }
-    .AVATAR-UPLOADER .EL-UPLOAD:HOVER {
-      BORDER-COLOR: #409EFF;
+    .avatar-uploader .el-upload:hover {
+      border-color: #409eff;
     }
-    .AVATAR-UPLOADER-ICON {
-      FONT-SIZE: 28PX;
-      COLOR: #8C939D;
-      WIDTH: 178PX;
-      HEIGHT: 178PX;
-      LINE-HEIGHT: 178PX;
-      TEXT-ALIGN: CENTER;
+    .avatar-uploader-icon {
+      font-size: 28px;
+      color: #8c939d;
+      width: 178px;
+      height: 178px;
+      line-height: 178px;
+      text-align: center;
     }
-    .AVATAR {
-      WIDTH: 178PX;
-      HEIGHT: 178PX;
-      DISPLAY: BLOCK;
+    .avatar {
+      width: 178px;
+      height: 178px;
+      display: block;
     }
-    </STYLE>
+    </style>
 
 ##  ## over~
