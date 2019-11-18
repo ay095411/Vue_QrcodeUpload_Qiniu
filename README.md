@@ -119,7 +119,7 @@
     
     
     
-#  #写upload.vue 代码比较简单，从element-ui官网拷贝过来就可以用了
+#  #写upload.vue
     <template>
       <!-- upload -->
       <div class="upload">
